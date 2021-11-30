@@ -1,0 +1,202 @@
+<!--
+ * @Author: max
+ * @Date: 2021-11-19 15:09:40
+ * @LastEditTime: 2021-11-24 16:18:09
+ * @LastEditors: max
+ * @Description: 
+ * @FilePath: /vben-admin-thin-next-main/src/views/admin/user/component/UserFormModal.vue
+-->
+<template>
+  <div>
+    <BasicModal
+      v-bind="$attrs"
+      @register="registerModal"
+      centered
+      maskClosable
+      :title="getTitle"
+      @ok="handleSubmit"
+      width="50%"
+    >
+      <Tabs v-model:activeKey="activeKey">
+        <TabPane key="1" tab="Tab 1">
+          <div class="avatar-box">
+            <Upload
+              v-model:file-list="fileList"
+              name="avatar"
+              fileList="[]"
+              accept="image/*"
+              list-type="picture-card"
+              class="avatar-uploader"
+              :beforeUpload="handleBeforeUpload"
+              :show-upload-list="false"
+            >
+              <img v-if="previewSource" :src="previewSource" alt="avatar" />
+              <div v-else>
+                <Icon v-if="loading" icon="ant-design:loading-outlined" />
+                <Icon v-else icon="ant-design:plus-outlined" />
+                <div class="ant-upload-text">头像上传</div>
+              </div>
+            </Upload>
+          </div>
+          <BasicForm @register="registerForm" />
+        </TabPane>
+        <TabPane key="2" tab="Tab 2">
+          <Form :model="formState" :label-col="labelCol" :wrapper-col="wrapperCol">
+            <FormItem label="Activity name">
+              <a-input v-model:value="formState.name" />
+            </FormItem>
+          </Form>
+        </TabPane>
+        <TabPane key="3" tab="Tab 3">Content of Tab Pane 3</TabPane>
+      </Tabs>
+    </BasicModal>
+  </div>
+</template>
+<script lang="ts">
+  import { defineComponent, ref, computed, unref } from 'vue';
+  import { BasicModal, useModalInner } from '/@/components/Modal';
+  import { BasicForm, useForm } from '/@/components/Form/index';
+  import { dataFormSchema } from '../data/list';
+  // import { getEnterList, getInstitutionList } from '/@/api/system/system';
+  import { Tabs, Upload, Form } from 'ant-design-vue';
+  import { Icon } from '/@/components/Icon';
+  export default defineComponent({
+    components: {
+      BasicModal,
+      BasicForm,
+      Tabs,
+      TabPane: Tabs.TabPane,
+      Upload,
+      Icon,
+      Form,
+      FormItem: Form.FormItem,
+    },
+    emits: ['success', 'register'],
+    setup(_, { emit }) {
+      const isUpdate = ref(true);
+      const rowId = ref('');
+      const SuperiorEnter = ref('');
+      const enterTypeInfo = ref(Array);
+      const previewSource = ref('');
+      const [registerForm, { setFieldsValue, resetFields, validate }] = useForm({
+        labelWidth: 120,
+        schemas: dataFormSchema,
+        showActionButtonGroup: false,
+        actionColOptions: {
+          span: 23,
+        },
+        baseColProps: { lg: 12, md: 24 },
+      });
+
+      const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+        resetFields();
+        setModalProps({ confirmLoading: false });
+        isUpdate.value = !!data?.isUpdate;
+        if (unref(isUpdate)) {
+          setFieldsValue({
+            ...data.record,
+          });
+        }
+        // const list = await getEnterList({ pageindex: 1, pagesize: 100 });
+        // const typeList = await getInstitutionList({ pageindex: 1, pagesize: 100 });
+        // console.log('typeList', typeList);
+        // list.forEach((item) => {
+        //   item.label = item.EnterName;
+        //   item.value = item.EnterId;
+        // });
+        // typeList.forEach((item) => {
+        //   item.label = item.EnterTypeName;
+        //   item.value = item.EnterTypeCode;
+        // });
+        // list.unshift({
+        //   label: '顶级',
+        //   value: '0',
+        // });
+        // updateSchema([
+        //   {
+        //     field: 'SuperiorEnterId',
+        //     componentProps: {
+        //       options: list,
+        //       onChange: (e) => {
+        //         if (e == 0) SuperiorEnter.value = '顶级';
+        //         return;
+        //         const { EnterName } = list.find((item) => item.EnterId === e);
+        //         SuperiorEnter.value = EnterName;
+        //       },
+        //     },
+        //   },
+        //   {
+        //     field: 'EnterTypeName',
+        //     componentProps: {
+        //       options: typeList,
+        //       onChange: (e) => {
+        //         enterTypeInfo.value = typeList.find((item) => item.EnterTypeCode === e);
+        //         console.log(enterTypeInfo);
+        //       },
+        //     },
+        //   },
+        // ]);
+      });
+
+      const getTitle = computed(() => (!unref(isUpdate) ? '新增用户' : '编辑用户'));
+      async function handleSubmit() {
+        try {
+          const values = await validate();
+          values.EnterTypeId = enterTypeInfo.value.EnterTypeId;
+          values.EnterTypeName = enterTypeInfo.value.EnterTypeName;
+          values.EnterTypeCode = enterTypeInfo.value.EnterTypeCode;
+          if (SuperiorEnter.value != '') {
+            values.SuperiorEnterName = SuperiorEnter.value;
+          } else {
+            values.SuperiorEnterName = '';
+            values.SuperiorEnterId = '';
+          }
+          setModalProps({ confirmLoading: true });
+          closeModal();
+          if (!unref(isUpdate)) {
+            //新增
+            emit('success', { isUpdate: unref(isUpdate), values: { ...values } });
+          } else {
+            //编辑
+            emit('success', {
+              isUpdate: unref(isUpdate),
+              values: { ...values, EnterId: rowId.value },
+            });
+          }
+        } finally {
+          setModalProps({ confirmLoading: false });
+        }
+      }
+      // Block upload
+      function handleBeforeUpload(file: File) {
+        const reader = new FileReader();
+        console.log('reader', reader);
+        reader.readAsDataURL(file);
+        previewSource.value = '';
+        reader.onload = function (e) {
+          previewSource.value = (e.target?.result as string) ?? '';
+          filename = file.name;
+        };
+        return false;
+      }
+      return {
+        registerModal,
+        registerForm,
+        getTitle,
+        handleSubmit,
+        activeKey: ref('1'),
+        labelCol: { span: 4 },
+        wrapperCol: { span: 14 },
+        handleBeforeUpload,
+        previewSource,
+      };
+    },
+  });
+</script>
+<style lang="less">
+  .avatar-box {
+    display: flex;
+    align-items: center;
+    margin-left: 120px;
+  }
+</style>

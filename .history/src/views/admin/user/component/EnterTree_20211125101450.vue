@@ -1,0 +1,95 @@
+<!--
+ * @Author: max
+ * @Date: 2021-11-22 16:53:18
+ * @LastEditTime: 2021-11-25 10:13:13
+ * @LastEditors: max
+ * @Description: 
+ * @FilePath: /vben-admin-thin-next-main/src/views/admin/user/component/EnterTree.vue
+-->
+<template>
+  <div class="bg-white m-4 mr-0 overflow-hidden">
+    <div class="tree-select">
+      <p>机构类型选择:</p>
+      <Select
+        ref="select"
+        v-model:value="enterTypeVale"
+        style="width: 200px"
+        @change="handleChange"
+      >
+        <SelectOption
+          v-for="item in treeOptions"
+          :key="item.EnterTypeId"
+          :value="item.EnterTypeId"
+          >{{ item.EnterTypeName }}</SelectOption
+        >
+      </Select>
+    </div>
+    <BasicTree
+      :clickRowToExpand="false"
+      :defaultExpandAll="true"
+      :treeData="treeData"
+      :selectedKeys="selectedKeys"
+      :replaceFields="{ key: 'Id', title: 'EnterName' }"
+      @select="handleSelect"
+    />
+  </div>
+</template>
+<script lang="ts">
+  import { defineComponent, onMounted, ref } from 'vue';
+  import { BasicTree, TreeItem } from '/@/components/Tree';
+  import { getEnterTree, getInstitutionList } from '/@/api/system/system';
+  import { Select, SelectTypes, SelectOption } from 'ant-design-vue';
+  export default defineComponent({
+    components: { BasicTree, Select, SelectOption },
+    emits: ['select'],
+    setup(_, { emit }) {
+      const treeOptions = ref<SelectTypes['options']>([]);
+      const treeData = ref<TreeItem[]>([]);
+      const enterTypeVale = ref('');
+      const entertypeid = ref('');
+      const selectedKeys = ref([]);
+      //获取机构列表
+      async function fetch() {
+        treeData.value = (await getEnterTree({
+          entertypeid: entertypeid.value,
+        })) as unknown as TreeItem[];
+        console.log('aaaaaa', treeData.value[0]);
+        selectedKeys.value = treeData.value[0].Id;
+      }
+      //获取机构类型类别
+      async function getEnterType() {
+        const { list } = await getInstitutionList({ pageindex: 1, pagesize: 20 });
+        enterTypeVale.value = list[0].EnterTypeId;
+        entertypeid.value = list[0].EnterTypeId;
+        treeOptions.value = list;
+        fetch();
+      }
+      //类型选择
+      const handleChange = (value: string) => {
+        entertypeid.value = value;
+        fetch();
+      };
+      function handleSelect(keys) {
+        emit('select', keys[0]);
+      }
+      onMounted(() => {
+        getEnterType();
+      });
+      return { treeData, treeOptions, handleChange, enterTypeVale, handleSelect, selectedKeys };
+    },
+  });
+</script>
+<style lang="less">
+  .tree-select {
+    padding: 5px 20px;
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    p {
+      height: 40px;
+      line-height: 40px;
+      margin: 0;
+    }
+  }
+</style>

@@ -1,0 +1,84 @@
+<!--
+ * @Author: max
+ * @Date: 2021-11-11 13:54:56
+ * @LastEditTime: 2021-11-23 09:39:05
+ * @LastEditors: max
+ * @Description: 
+ * @FilePath: /vben-admin-thin-next-main/src/views/admin/user/list.vue
+-->
+<template>
+  <PageWrapper dense contentFullHeight fixedHeight contentClass="flex">
+    <EnterTree class="w-1/4 xl:w-1/5" @select="handleSelect" />
+    <BasicTable @register="registerTable" class="w-3/4 xl:w-4/5" :searchInfo="searchInfo">
+      <template #toolbar>
+        <a-button type="primary" @click="handleCreate">新增账号</a-button>
+      </template>
+      <template #action="{ record }">
+        <TableAction
+          :actions="[
+            {
+              icon: 'clarity:info-standard-line',
+              tooltip: '查看用户详情',
+              onClick: handleView.bind(null, record),
+            },
+            {
+              icon: 'clarity:note-edit-line',
+              tooltip: '编辑用户资料',
+              onClick: handleEdit.bind(null, record),
+            },
+            {
+              icon: 'ant-design:delete-outlined',
+              color: 'error',
+              tooltip: '删除此账号',
+              popConfirm: {
+                title: '是否确认删除',
+                confirm: handleDelete.bind(null, record),
+              },
+            },
+          ]"
+        />
+      </template>
+    </BasicTable>
+  </PageWrapper>
+</template>
+<script lang="ts">
+  import { defineComponent } from 'vue';
+  import { PageWrapper } from '/@/components/Page';
+  import { getUserList } from '/@/api/system/system';
+  import EnterTree from './component/EnterTree.vue';
+  import { BasicTable, useTable, TableAction } from '/@/components/Table';
+
+  export default defineComponent({
+    name: 'userList',
+    components: { BasicTable, PageWrapper, EnterTree, TableAction },
+    setup() {
+      const [registerTable] = useTable({
+        title: '用户列表',
+        api: getUserList,
+        rowKey: 'id',
+        columns,
+        formConfig: {
+          labelWidth: 120,
+          schemas: searchFormSchema,
+          autoSubmitOnEnter: true,
+        },
+        useSearchForm: true,
+        showTableSetting: true,
+        bordered: true,
+        handleSearchInfoFn(info) {
+          console.log('handleSearchInfoFn', info);
+          return info;
+        },
+        actionColumn: {
+          width: 120,
+          title: '操作',
+          dataIndex: 'action',
+          slots: { customRender: 'action' },
+        },
+      });
+      return {
+        registerTable,
+      };
+    },
+  });
+</script>

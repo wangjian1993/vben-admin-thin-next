@@ -1,0 +1,125 @@
+<!--
+ * @Author: max
+ * @Date: 2021-11-11 13:43:39
+ * @LastEditTime: 2021-11-15 15:30:15
+ * @LastEditors: max
+ * @Description: 
+ * @FilePath: /vben-admin-thin-next-main/src/views/admin/institutions/type.vue
+-->
+<template>
+  <PageWrapper>
+    <BasicTable @register="registerTable">
+      <template #tableTitle>
+        <a-button type="primary" preIcon="ant-design:plus-outlined">新增</a-button>
+        <a-button style="margin-left: 10px" preIcon="ant-design:delete-outlined">删除</a-button>
+      </template>
+      <template #toolbar>
+        <a-form :model="formState" :label-col="labelCol" :wrapper-col="wrapperCol">
+          <a-form-item label="">
+            <a-input v-model:value="formState.name" style="width: 200px" />
+          </a-form-item>
+          <a-form-item :wrapper-col="{ span: 8, offset: 1 }" style="margin-left: 10px">
+            <a-button type="primary" preIcon="ant-design:search-outlined"> 搜索 </a-button>
+            <a-button style="margin-left: 10px" preIcon="ant-design:reload-outlined">重置</a-button>
+          </a-form-item>
+        </a-form>
+      </template>
+      <template #Enable="{ text }">
+        <Tag :color="text === 'Y' ? 'success' : 'error'">
+          {{ text === 'Y' ? '启用' : '禁用' }}
+        </Tag>
+      </template>
+      <template #IsDefualt="{ text }">
+        <Tag :color="text === 'Y' ? 'success' : 'error'">
+          {{ text === 'Y' ? '是' : '否' }}
+        </Tag>
+      </template>
+      <template #action="{ record }">
+        <TableAction
+          :actions="[
+            {
+              icon: 'clarity:note-edit-line',
+              tooltip: '编辑',
+              onClick: handleEdit.bind(null, record),
+            },
+            {
+              icon: 'ant-design:delete-outlined',
+              tooltip: '删除',
+              color: 'error',
+              popConfirm: {
+                title: '是否确认删除',
+                confirm: handleDelete.bind(null, record),
+              },
+            },
+          ]"
+        />
+      </template>
+    </BasicTable>
+  </PageWrapper>
+</template>
+<script lang="ts">
+  import { defineComponent } from 'vue';
+  import { BasicTable, useTable, TableAction } from '/@/components/Table';
+  import { columns } from './type.data';
+  import { defineComponent, reactive, toRaw, UnwrapRef } from 'vue';
+  import { getInstitutionList } from '/@/api/system/system';
+  import { PageWrapper } from '/@/components/Page';
+  import { Tag } from 'ant-design-vue';
+  interface FormState {
+    name: string;
+  }
+  export default defineComponent({
+    components: { BasicTable, PageWrapper, Tag },
+    setup() {
+      const [registerTable] = useTable({
+        title: '',
+        api: getInstitutionList,
+        columns,
+        showTableSetting: true,
+        bordered: true,
+        showIndexColumn: true,
+        TableSetting: {
+          redo: true,
+          fullScreen: true,
+        },
+        actionColumn: {
+          width: 80,
+          title: '操作',
+          dataIndex: 'action',
+          slots: { customRender: 'action' },
+          fixed: undefined,
+        },
+      });
+      const formState: UnwrapRef<FormState> = reactive({
+        name: '',
+      });
+      const onSubmit = () => {
+        console.log('submit!', toRaw(formState));
+      };
+      function handleEdit(record: Recordable) {
+        console.log(record);
+        // record.parentId = record.parentId === '' ? null : record.parentId;
+        // openModal(true, {
+        //   record,
+        //   isUpdate: true,
+        // });
+      }
+
+      async function handleDelete(record: Recordable) {
+        console.log(record);
+        // await removeObj({ ids: record.id });
+        // createMessage.success('删除成功！');
+        // emit('refresh-tree', record.parentId);
+        // 表格刷新，在refresh-tree事件之后，执行
+        // await reload();
+      }
+      return {
+        handleEdit,
+        handleDelete,
+        registerTable,
+        formState,
+        onSubmit,
+      };
+    },
+  });
+</script>

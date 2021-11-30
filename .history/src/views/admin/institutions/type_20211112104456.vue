@@ -1,0 +1,35 @@
+<template>
+  <div>
+    <BasicTable
+      :columns="columns"
+      :dataSource="data"
+      :canResize="canResize"
+      :loading="loading"
+      :striped="striped"
+      :bordered="border"
+      showTableSetting
+      useSearchForm
+      :pagination="{ pageSize: 20 }"
+    >
+      <template #tableTitle>
+        <a-button type="primary" style="">操作按钮</a-button>
+        <a-input type="text" style="width: 200px" />
+      </template>
+    </BasicTable>
+  </div>
+</template>
+<script lang="ts">
+  import { defineComponent } from 'vue';
+  import { BasicTable } from '/@/components/Table';
+  import { getBasicColumns, getBasicData } from './tableData';
+
+  export default defineComponent({
+    components: { BasicTable },
+    setup() {
+      return {
+        columns: getBasicColumns(),
+        data: getBasicData(),
+      };
+    },
+  });
+</script>

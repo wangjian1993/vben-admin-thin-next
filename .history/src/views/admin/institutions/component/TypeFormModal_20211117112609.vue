@@ -1,0 +1,68 @@
+<template>
+  <BasicModal
+    v-bind="$attrs"
+    @register="registerModal"
+    centered
+    maskClosable
+    :title="getTitle"
+    @ok="handleSubmit"
+  >
+    <BasicForm @register="registerForm" />
+  </BasicModal>
+</template>
+<script lang="ts">
+  import { defineComponent, ref, computed, unref } from 'vue';
+  import { BasicModal, useModalInner } from '/@/components/Modal';
+  import { BasicForm, useForm } from '/@/components/Form/index';
+  import { dataFormSchema } from '../data/type';
+  export default defineComponent({
+    components: { BasicModal, BasicForm },
+    emits: ['success', 'register'],
+    setup(_, { emit }) {
+      const isUpdate = ref(true);
+      const rowId = ref('');
+      const [registerForm, { setFieldsValue, resetFields, validate }] = useForm({
+        labelWidth: 100,
+        schemas: dataFormSchema,
+        showActionButtonGroup: false,
+        actionColOptions: {
+          span: 23,
+        },
+      });
+
+      const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
+        resetFields();
+        setModalProps({ confirmLoading: false });
+        isUpdate.value = !!data?.isUpdate;
+
+        if (unref(isUpdate)) {
+          rowId.value = data.record.EnterTypeId;
+          setFieldsValue({
+            ...data.record,
+          });
+          updateSchema([
+            {
+              field: 'EnterTypeCode',
+              componentProps: { disabled: true },
+            },
+          ]);
+        }
+      });
+
+      const getTitle = computed(() => (!unref(isUpdate) ? '新增机构' : '编辑机构'));
+      async function handleSubmit() {
+        try {
+          const values = await validate();
+          setModalProps({ confirmLoading: true });
+          // TODO custom api
+          closeModal();
+          emit('success', { isUpdate: unref(isUpdate), values: { ...values } });
+        } finally {
+          setModalProps({ confirmLoading: false });
+        }
+      }
+
+      return { registerModal, registerForm, getTitle, handleSubmit };
+    },
+  });
+</script>
