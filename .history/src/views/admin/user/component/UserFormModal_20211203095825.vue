@@ -1,7 +1,7 @@
 <!--
  * @Author: max
  * @Date: 2021-11-19 15:09:40
- * @LastEditTime: 2021-12-03 10:06:39
+ * @LastEditTime: 2021-12-03 09:58:25
  * @LastEditors: max
  * @Description: 
  * @FilePath: /vben-admin-thin-next-main/src/views/admin/user/component/UserFormModal.vue
@@ -100,9 +100,6 @@
         name: '',
       });
       const isUpdate = ref(true);
-      const rowId = ref('');
-      const SuperiorEnter = ref('');
-      const enterTypeInfo = ref(Array);
       const previewSource = ref('');
       const orgList = ref([]);
       const rolesValue = ref<string>('');
@@ -175,27 +172,28 @@
       async function handleSubmit() {
         try {
           const values = await validate();
-          values.EnterTypeId = enterTypeInfo.value.EnterTypeId;
-          values.EnterTypeName = enterTypeInfo.value.EnterTypeName;
-          values.EnterTypeCode = enterTypeInfo.value.EnterTypeCode;
-          if (SuperiorEnter.value != '') {
-            values.SuperiorEnterName = SuperiorEnter.value;
-          } else {
-            values.SuperiorEnterName = '';
-            values.SuperiorEnterId = '';
-          }
-          setModalProps({ confirmLoading: true });
-          closeModal();
-          if (!unref(isUpdate)) {
-            //新增
-            emit('success', { isUpdate: unref(isUpdate), values: { ...values } });
-          } else {
-            //编辑
-            emit('success', {
-              isUpdate: unref(isUpdate),
-              values: { ...values, EnterId: rowId.value },
-            });
-          }
+          console.log('values', values);
+          // values.EnterTypeId = enterTypeInfo.value.EnterTypeId;
+          // values.EnterTypeName = enterTypeInfo.value.EnterTypeName;
+          // values.EnterTypeCode = enterTypeInfo.value.EnterTypeCode;
+          // if (SuperiorEnter.value != '') {
+          //   values.SuperiorEnterName = SuperiorEnter.value;
+          // } else {
+          //   values.SuperiorEnterName = '';
+          //   values.SuperiorEnterId = '';
+          // }
+          // setModalProps({ confirmLoading: true });
+          // closeModal();
+          // if (!unref(isUpdate)) {
+          //   //新增
+          //   emit('success', { isUpdate: unref(isUpdate), values: { ...values } });
+          // } else {
+          //   //编辑
+          //   emit('success', {
+          //     isUpdate: unref(isUpdate),
+          //     values: { ...values, EnterId: rowId.value },
+          //   });
+          // }
         } finally {
           setModalProps({ confirmLoading: false });
         }

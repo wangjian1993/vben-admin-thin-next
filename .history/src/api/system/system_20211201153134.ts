@@ -1,7 +1,7 @@
 /*
  * @Author: max
  * @Date: 2021-11-11 13:49:15
- * @LastEditTime: 2021-12-01 17:58:57
+ * @LastEditTime: 2021-12-01 15:31:34
  * @LastEditors: max
  * @Description: 机构列表
  * @FilePath: /vben-admin-thin-next-main/src/api/system/system.ts
@@ -14,7 +14,7 @@ enum Api {
   userTypeApi = '/api/base/usertype/', //用户类型
   userApi = '/api/base/user/', //用户
   orgApi = '/api/base/orgdimension/', //组织
-  orgInfoApi = '/api/base/orginfo/',
+  orgInfoApi = '/api/base/orginfo',
 }
 //机构类型
 export function getInstitutionList(params?: object) {

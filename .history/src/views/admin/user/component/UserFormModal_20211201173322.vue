@@ -1,7 +1,7 @@
 <!--
  * @Author: max
  * @Date: 2021-11-19 15:09:40
- * @LastEditTime: 2021-12-03 10:06:39
+ * @LastEditTime: 2021-12-01 17:33:21
  * @LastEditors: max
  * @Description: 
  * @FilePath: /vben-admin-thin-next-main/src/views/admin/user/component/UserFormModal.vue
@@ -62,7 +62,7 @@
           <RadioGroup v-model:value="rolesValue" :options="rolesOptions" />
         </TabPane>
       </Tabs>
-      <OrgListModal @register="register" @orgSubSelect="orgSubSelect" />
+      <OrgListModal @register="register" />
     </BasicModal>
   </div>
 </template>
@@ -203,9 +203,9 @@
       // Block upload
       function handleBeforeUpload(file: File) {
         const reader = new FileReader();
+        console.log('reader', reader);
         reader.readAsDataURL(file);
         previewSource.value = '';
-        console.log('file====', file);
         reader.onload = function (e) {
           previewSource.value = (e.target?.result as string) ?? '';
           filename = file.name;
@@ -216,14 +216,6 @@
         openModal(true, {
           enterId: enterId.value,
           record,
-        });
-      }
-      //组织机构选择
-      function orgSubSelect(record) {
-        orgList.value.find((item) => {
-          if (item.OrgDimensionId == record.OrgDimensionId) {
-            item.levelArray = record;
-          }
         });
       }
       return {
@@ -243,7 +235,6 @@
         register,
         openModal,
         checkOrg,
-        orgSubSelect,
       };
     },
   });

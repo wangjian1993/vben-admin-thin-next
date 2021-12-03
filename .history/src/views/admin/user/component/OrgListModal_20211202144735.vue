@@ -1,7 +1,7 @@
 <!--
  * @Author: max
  * @Date: 2021-11-25 09:18:09
- * @LastEditTime: 2021-12-02 14:48:21
+ * @LastEditTime: 2021-12-02 14:47:09
  * @LastEditors: max
  * @Description: 
  * @FilePath: /vben-admin-thin-next-main/src/views/admin/user/component/OrgListModal.vue
@@ -35,6 +35,7 @@
     setup(_, { emit }) {
       const searchInfo = reactive<Recordable>({});
       const checkedKeys = ref<Array<string | number>>([]);
+      const modalTitle = ref('');
       const [registerTable, { reload, getRawDataSource }] = useTable({
         api: getOrginfo,
         columns,
@@ -55,7 +56,8 @@
       });
       const [register, { closeModal, setModalProps }] = useModalInner(async (data) => {
         searchInfo.dimsensionId = data.record.OrgDimensionId;
-        setModalProps({ title: `${data.record.OrgDimensionName}选择` });
+        modalTitle.value = data.record.OrgDimensionName;
+        setModalProps({ title: modalTitle + '选择' });
         searchInfo.enterid = data.enterId;
         reload();
       });

@@ -1,7 +1,7 @@
 /*
  * @Author: max
  * @Date: 2021-11-25 09:49:22
- * @LastEditTime: 2021-12-02 10:04:24
+ * @LastEditTime: 2021-12-01 15:28:38
  * @LastEditors: max
  * @Description:
  * @FilePath: /vben-admin-thin-next-main/src/views/admin/user/data/org.ts
@@ -21,7 +21,6 @@ export const columns: BasicColumn[] = [
     title: '组织名称',
     dataIndex: 'OrgName',
     slots: { customRender: 'OrgName' },
-    align: 'left',
   },
   {
     title: '组织编码',

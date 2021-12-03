@@ -1,7 +1,7 @@
 <!--
  * @Author: max
  * @Date: 2021-11-25 09:18:09
- * @LastEditTime: 2021-12-02 14:48:21
+ * @LastEditTime: 2021-12-02 14:41:35
  * @LastEditors: max
  * @Description: 
  * @FilePath: /vben-admin-thin-next-main/src/views/admin/user/component/OrgListModal.vue
@@ -9,7 +9,7 @@
 <template>
   <BasicModal
     v-bind="$attrs"
-    title="选择"
+    :title="`${modalTitle}选择`"
     width="50%"
     @register="register"
     :maskClosable="true"
@@ -35,6 +35,7 @@
     setup(_, { emit }) {
       const searchInfo = reactive<Recordable>({});
       const checkedKeys = ref<Array<string | number>>([]);
+      const modalTitle = ref('');
       const [registerTable, { reload, getRawDataSource }] = useTable({
         api: getOrginfo,
         columns,
@@ -53,9 +54,10 @@
         showIndexColumn: false,
         bordered: true,
       });
-      const [register, { closeModal, setModalProps }] = useModalInner(async (data) => {
+      const [register, { closeModal }] = useModalInner(async (data) => {
         searchInfo.dimsensionId = data.record.OrgDimensionId;
-        setModalProps({ title: `${data.record.OrgDimensionName}选择` });
+        modalTitle.value = data.record.OrgDimensionName;
+        console.log('modalTitle===', modalTitle);
         searchInfo.enterid = data.enterId;
         reload();
       });

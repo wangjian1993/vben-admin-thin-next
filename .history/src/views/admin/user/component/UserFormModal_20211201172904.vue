@@ -1,7 +1,7 @@
 <!--
  * @Author: max
  * @Date: 2021-11-19 15:09:40
- * @LastEditTime: 2021-12-03 10:06:39
+ * @LastEditTime: 2021-12-01 17:29:04
  * @LastEditors: max
  * @Description: 
  * @FilePath: /vben-admin-thin-next-main/src/views/admin/user/component/UserFormModal.vue
@@ -62,7 +62,7 @@
           <RadioGroup v-model:value="rolesValue" :options="rolesOptions" />
         </TabPane>
       </Tabs>
-      <OrgListModal @register="register" @orgSubSelect="orgSubSelect" />
+      <OrgListModal @register="register" />
     </BasicModal>
   </div>
 </template>
@@ -107,7 +107,6 @@
       const orgList = ref([]);
       const rolesValue = ref<string>('');
       const rolesOptions = ref<array>([]);
-      const enterId = ref('');
       const [register, { openModal }] = useModal();
       const [registerForm, { setFieldsValue, resetFields, validate }] = useForm({
         labelWidth: 120,
@@ -123,7 +122,7 @@
         resetFields();
         setModalProps({ confirmLoading: false });
         isUpdate.value = !!data?.isUpdate;
-        enterId.value = data.enterid;
+        console.log('传递====', data);
         if (unref(isUpdate)) {
           setFieldsValue({
             ...data.record,
@@ -203,9 +202,9 @@
       // Block upload
       function handleBeforeUpload(file: File) {
         const reader = new FileReader();
+        console.log('reader', reader);
         reader.readAsDataURL(file);
         previewSource.value = '';
-        console.log('file====', file);
         reader.onload = function (e) {
           previewSource.value = (e.target?.result as string) ?? '';
           filename = file.name;
@@ -214,16 +213,7 @@
       }
       function checkOrg(record) {
         openModal(true, {
-          enterId: enterId.value,
           record,
-        });
-      }
-      //组织机构选择
-      function orgSubSelect(record) {
-        orgList.value.find((item) => {
-          if (item.OrgDimensionId == record.OrgDimensionId) {
-            item.levelArray = record;
-          }
         });
       }
       return {
@@ -243,7 +233,6 @@
         register,
         openModal,
         checkOrg,
-        orgSubSelect,
       };
     },
   });

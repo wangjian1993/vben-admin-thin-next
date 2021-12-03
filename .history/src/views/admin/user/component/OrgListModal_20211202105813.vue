@@ -1,7 +1,7 @@
 <!--
  * @Author: max
  * @Date: 2021-11-25 09:18:09
- * @LastEditTime: 2021-12-02 14:48:21
+ * @LastEditTime: 2021-12-02 10:58:00
  * @LastEditors: max
  * @Description: 
  * @FilePath: /vben-admin-thin-next-main/src/views/admin/user/component/OrgListModal.vue
@@ -9,12 +9,11 @@
 <template>
   <BasicModal
     v-bind="$attrs"
-    title="选择"
+    title="行政组织选择"
     width="50%"
     @register="register"
     :maskClosable="true"
     centered
-    @ok="handleOk"
   >
     <BasicTable
       @register="registerTable"
@@ -35,10 +34,10 @@
     setup(_, { emit }) {
       const searchInfo = reactive<Recordable>({});
       const checkedKeys = ref<Array<string | number>>([]);
-      const [registerTable, { reload, getRawDataSource }] = useTable({
+      const [registerTable, { reload }] = useTable({
         api: getOrginfo,
         columns,
-        rowKey: 'index',
+        rowKey: 'OrgId',
         formConfig: {
           labelWidth: 120,
           schemas: searchFormSchema,
@@ -47,15 +46,13 @@
         rowSelection: {
           type: 'radio',
           selectedRowKeys: checkedKeys,
-          onChange: onSelectChange,
         },
         useSearchForm: true,
         showIndexColumn: false,
         bordered: true,
       });
-      const [register, { closeModal, setModalProps }] = useModalInner(async (data) => {
+      const [register] = useModalInner(async (data) => {
         searchInfo.dimsensionId = data.record.OrgDimensionId;
-        setModalProps({ title: `${data.record.OrgDimensionName}选择` });
         searchInfo.enterid = data.enterId;
         reload();
       });
@@ -65,17 +62,8 @@
         checkedKeys.value = selectedRowKeys;
       }
       function handleRowDbClick(record: Recordable) {
+        console.log('handleRowDbClick', record);
         emit('orgSubSelect', record);
-        closeModal();
-      }
-      //多选
-      function onSelectChange(selectedRowKeys: (string | number)[]) {
-        checkedKeys.value = selectedRowKeys;
-      }
-      async function handleOk() {
-        let { list } = await getRawDataSource();
-        emit('orgSubSelect', list[checkedKeys.value[0]]);
-        closeModal();
       }
       return {
         registerTable,
@@ -83,7 +71,6 @@
         register,
         onSelectChange,
         handleRowDbClick,
-        handleOk,
       };
     },
   });

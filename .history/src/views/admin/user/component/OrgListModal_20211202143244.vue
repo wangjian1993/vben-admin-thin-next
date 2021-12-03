@@ -1,7 +1,7 @@
 <!--
  * @Author: max
  * @Date: 2021-11-25 09:18:09
- * @LastEditTime: 2021-12-02 14:48:21
+ * @LastEditTime: 2021-12-02 14:32:07
  * @LastEditors: max
  * @Description: 
  * @FilePath: /vben-admin-thin-next-main/src/views/admin/user/component/OrgListModal.vue
@@ -9,12 +9,11 @@
 <template>
   <BasicModal
     v-bind="$attrs"
-    title="选择"
+    title="行政组织选择"
     width="50%"
     @register="register"
     :maskClosable="true"
     centered
-    @ok="handleOk"
   >
     <BasicTable
       @register="registerTable"
@@ -53,9 +52,8 @@
         showIndexColumn: false,
         bordered: true,
       });
-      const [register, { closeModal, setModalProps }] = useModalInner(async (data) => {
+      const [register, { closeModal }] = useModalInner(async (data) => {
         searchInfo.dimsensionId = data.record.OrgDimensionId;
-        setModalProps({ title: `${data.record.OrgDimensionName}选择` });
         searchInfo.enterid = data.enterId;
         reload();
       });
@@ -71,10 +69,9 @@
       //多选
       function onSelectChange(selectedRowKeys: (string | number)[]) {
         checkedKeys.value = selectedRowKeys;
-      }
-      async function handleOk() {
-        let { list } = await getRawDataSource();
-        emit('orgSubSelect', list[checkedKeys.value[0]]);
+        let tableData = getRawDataSource();
+        console.log(tableData);
+        emit('orgSubSelect', tableData[selectedRowKeys[0]]);
         closeModal();
       }
       return {
@@ -83,7 +80,6 @@
         register,
         onSelectChange,
         handleRowDbClick,
-        handleOk,
       };
     },
   });
